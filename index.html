@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0B0F19">
+  <title>RE Банк — Neo Banking</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="min-h-screen bg-[#0B0F19] text-slate-100">
+  <div class="ambient ambient-a"></div>
+  <div class="ambient ambient-b"></div>
+
+  <main id="auth-screen" class="min-h-screen hidden items-center justify-center px-4 py-10">
+    <section class="glass auth-card w-full max-w-md rounded-3xl p-7 sm:p-9">
+      <div class="mb-8 text-center">
+        <div class="brand-mark mx-auto mb-4">RE</div>
+        <h1 class="text-3xl font-extrabold tracking-tight">RE Банк</h1>
+        <p class="mt-2 text-sm text-slate-400">Футуристичный банк с игровой экономикой</p>
+      </div>
+      <div class="mb-6 grid grid-cols-2 rounded-2xl bg-black/20 p-1">
+        <button id="login-tab" class="auth-tab active">Вход</button>
+        <button id="register-tab" class="auth-tab">Регистрация</button>
+      </div>
+      <form id="auth-form" class="space-y-4">
+        <label class="field-label">Имя пользователя<input id="auth-username" class="input" required minlength="3" maxlength="50" autocomplete="username"></label>
+        <label id="auth-email-field" class="field-label hidden">Email<input id="auth-email" type="email" class="input" maxlength="320" autocomplete="email"></label>
+        <label class="field-label">Пароль<input id="auth-password" type="password" class="input" required minlength="8" maxlength="72" autocomplete="current-password"></label>
+        <button id="auth-submit" class="primary-button w-full" type="submit">Войти</button>
+      </form>
+      <p id="auth-message" class="mt-4 min-h-6 text-center text-sm text-rose-300"></p>
+    </section>
+  </main>
+
+  <main id="app-screen" class="hidden">
+    <header class="sticky top-0 z-40 border-b border-white/5 bg-[#0B0F19]/80 backdrop-blur-xl">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+        <div class="flex items-center gap-3">
+          <div class="brand-mark small">RE</div>
+          <div>
+            <div class="font-extrabold tracking-wide">RE Банк</div>
+            <div id="welcome-user" class="text-xs text-slate-500">Neo Banking</div>
+          </div>
+        </div>
+        <button id="logout-button" class="ghost-button">Выйти</button>
+      </div>
+    </header>
+
+    <section class="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+      <div class="mb-8 grid gap-5 lg:grid-cols-[1.25fr_.75fr]">
+        <div class="glass hero-card rounded-3xl p-6 sm:p-8">
+          <div class="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <div class="eyebrow">Общий баланс</div>
+              <div id="total-balance" class="mt-2 text-4xl font-extrabold tracking-tight sm:text-5xl">$0.00</div>
+              <div class="mt-3 flex flex-wrap gap-3 text-sm text-slate-400">
+                <span class="pill">Крипто: <b id="hero-crypto">0.00000000 BTC</b></span>
+                <span class="pill">BTC/USD: <b id="hero-rate">$0</b></span>
+              </div>
+            </div>
+            <div class="hero-orb">
+              <div class="hero-orb-inner">RE</div>
+            </div>
+          </div>
+        </div>
+        <div class="glass rounded-3xl p-6">
+          <div class="eyebrow">Активная карта</div>
+          <div id="active-card-mini" class="mt-4 rounded-2xl border border-cyan-300/10 bg-cyan-300/5 p-4"></div>
+        </div>
+      </div>
+
+      <section class="mb-10">
+        <div class="section-head">
+          <div><div class="eyebrow">Cards</div><h2 class="section-title">Ваши карты</h2></div>
+          <button id="create-card-button" class="secondary-button">+ Выпустить карту</button>
+        </div>
+        <div id="cards-grid" class="grid gap-5 md:grid-cols-2 xl:grid-cols-3"></div>
+        <div id="cards-limit-note" class="mt-3 text-xs text-slate-500"></div>
+      </section>
+
+      <section class="mb-10 grid gap-5 lg:grid-cols-[1fr_.95fr]">
+        <div class="glass rounded-3xl p-6">
+          <div class="section-head !mb-5">
+            <div><div class="eyebrow">Operations</div><h2 class="section-title">Активная карта для операций</h2></div>
+          </div>
+          <label class="field-label">Карта<select id="active-card-select" class="input"></select></label>
+          <div class="mt-5 flex flex-wrap gap-3">
+            <button id="set-rating-button" class="secondary-button">Установить для глобального рейтинга</button>
+          </div>
+          <p class="mt-4 text-sm text-slate-400">Эта карта используется для кликера, переводов и рулетки.</p>
+        </div>
+        <div class="glass rounded-3xl p-6">
+          <div class="section-head !mb-5">
+            <div><div class="eyebrow">Activity</div><h2 class="section-title">Баланс за 7 дней</h2></div>
+          </div>
+          <div class="h-64"><canvas id="balance-chart"></canvas></div>
+        </div>
+      </section>
+
+      <section class="mb-10 grid gap-5 lg:grid-cols-2">
+        <div class="glass rounded-3xl p-6 sm:p-7">
+          <div class="section-head">
+            <div><div class="eyebrow">Game Economy</div><h2 class="section-title">Кликер</h2></div>
+            <span class="pill green">+1$ за клик</span>
+          </div>
+          <div class="clicker-wrap">
+            <button id="click-button" class="clicker-button" aria-label="Получить один доллар"><span>$</span></button>
+            <div id="floating-text-layer" class="floating-layer"></div>
+          </div>
+          <div class="mt-4 text-center text-sm text-slate-400">Баланс активной карты: <b id="clicker-balance" class="text-emerald-300">$0.00</b></div>
+        </div>
+
+        <div class="glass rounded-3xl p-6 sm:p-7">
+          <div class="section-head">
+            <div><div class="eyebrow">P2P</div><h2 class="section-title">Перевод</h2></div>
+          </div>
+          <form id="transfer-form" class="space-y-4">
+            <label class="field-label">Номер карты получателя<input id="receiver-card" class="input" inputmode="numeric" maxlength="19" placeholder="4000 12XX XXXX XXXX" required></label>
+            <label class="field-label">Сумма ($)<input id="transfer-amount" class="input" inputmode="decimal" placeholder="25.00" required></label>
+            <button class="primary-button w-full" type="submit">Отправить перевод</button>
+          </form>
+          <div id="transfer-result" class="mt-4 min-h-10"></div>
+        </div>
+      </section>
+
+      <section class="mb-10 grid gap-5 lg:grid-cols-[1.15fr_.85fr]">
+        <div class="glass rounded-3xl p-6 sm:p-7">
+          <div class="section-head">
+            <div><div class="eyebrow">Crypto-USD</div><h2 class="section-title">Криптоцентр</h2></div>
+            <div class="rate-badge"><span class="rate-dot"></span><span id="crypto-rate">$0</span></div>
+          </div>
+          <div class="crypto-panel">
+            <div class="crypto-symbol">₿</div>
+            <div class="min-w-0"><div class="text-sm text-slate-400">Ваш баланс</div><div id="crypto-balance" class="mt-1 text-3xl font-extrabold">0.00000000 BTC</div></div>
+          </div>
+          <div class="mt-5 grid gap-3 sm:grid-cols-2">
+            <button id="earn-crypto-button" class="secondary-button purple">Собрать пассивный доход</button>
+            <button id="refresh-rate-button" class="secondary-button">Обновить курс</button>
+          </div>
+          <p id="crypto-message" class="mt-4 min-h-6 text-sm text-slate-400"></p>
+        </div>
+
+        <div class="glass rounded-3xl p-6 sm:p-7">
+          <div class="section-head !mb-5"><div><div class="eyebrow">Exchange</div><h2 class="section-title">Продать крипту</h2></div></div>
+          <form id="sell-crypto-form" class="space-y-4">
+            <label class="field-label">Количество BTC<input id="crypto-amount" class="input" inputmode="decimal" placeholder="0.00001000" required></label>
+            <label class="field-label">Зачислить на<select id="crypto-card-select" class="input"></select></label>
+            <button class="primary-button purple-button w-full" type="submit">Продать крипту</button>
+          </form>
+        </div>
+      </section>
+
+      <section class="mb-10 glass rounded-3xl p-6 sm:p-7">
+        <div class="section-head">
+          <div><div class="eyebrow">Lucky 77</div><h2 class="section-title">Рулетка</h2></div>
+          <span class="pill purple">Слот 77 = $100,000</span>
+        </div>
+        <div id="roulette-grid" class="roulette-grid"></div>
+        <div class="mt-6 flex flex-col items-center gap-3">
+          <button id="roulette-button" class="roulette-button">Крутить за 1$</button>
+          <p id="roulette-result" class="min-h-7 text-center text-sm text-slate-400"></p>
+        </div>
+      </section>
+
+      <section class="mb-10 glass rounded-3xl p-6 sm:p-7">
+        <div class="section-head">
+          <div><div class="eyebrow">Global</div><h2 class="section-title">Топ-50 игроков</h2></div>
+          <span class="pill">Обновление каждые 30 сек</span>
+        </div>
+        <div class="overflow-hidden rounded-2xl border border-white/5">
+          <div id="rating-list" class="divide-y divide-white/5"></div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <div id="toast" class="toast"></div>
+  <div id="confetti-layer" class="confetti-layer"></div>
+  <script src="config.js"></script>
+  <script>
+    const script = document.createElement('script');
+    script.src = window.RE_BANK_CONFIG.mode === 'supabase' ? 'supabase-app.js' : 'app.js';
+    script.type = window.RE_BANK_CONFIG.mode === 'supabase' ? 'module' : 'text/javascript';
+    script.onerror = () => {
+      document.getElementById('auth-message').textContent = 'Не удалось загрузить приложение. Проверьте конфигурацию Supabase.';
+    };
+    document.body.appendChild(script);
+  </script>
+</body>
+</html>

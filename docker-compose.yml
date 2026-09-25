@@ -1,0 +1,35 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: re_bank
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - re_bank_pg:/var/lib/postgresql/data
+      - ./backend-node/db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+
+  api-node:
+    build: ./backend-node
+    environment:
+      PORT: 3000
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/re_bank
+      JWT_SECRET: change-this-secret-before-production
+      CORS_ORIGIN: http://localhost:8080
+      NODE_ENV: production
+    depends_on:
+      - postgres
+    ports:
+      - "3000:3000"
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      - api-node
+    ports:
+      - "8080:80"
+
+volumes:
+  re_bank_pg:
